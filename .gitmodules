@@ -1,0 +1,3 @@
+[submodule "Engine"]
+	path = application_interactive/engine
+	url = git@github.com:Rikougo/SoulsEngine.git
