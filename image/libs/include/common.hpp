@@ -2,6 +2,7 @@
 #include <array>
 #include <iostream>
 #include <random>
+#include <string>
 
 namespace Common {
     struct ImageData {
@@ -9,7 +10,11 @@ namespace Common {
         int width, height, channels;
 
         static ImageData FromPath(const char* p_path);
+        static void SaveImage(ImageData &p_data, const char* p_path);
+        static void SaveImage(ImageData &p_data, std::string p_path);
     };
+
+    using ImagePair = std::pair<ImageData, ImageData>;
 
     // METRICS
     float ComputePSNR(const char* p_fPath, const char* p_sPath);
@@ -28,4 +33,12 @@ namespace Common {
     // ENCRYPTION
     ImageData EncryptData(const char* p_path, int p_key);
     ImageData DecryptData(const char* p_path, int p_key);
+
+    std::pair<ImagePair, ImagePair> EncryptECB(const char* p_path, unsigned char p_key);
+    std::pair<ImagePair, ImagePair> EncryptCBC(const char* p_path, unsigned char p_key);
+    std::pair<ImagePair, ImagePair> EncryptCFB(const char* p_path, unsigned char p_key);
+    std::pair<ImagePair, ImagePair> EncryptOFB(const char* p_path, unsigned char p_key);
+
+    int swapBits(unsigned int n, unsigned int p1, unsigned int p2);
+    ImageData RandomNoise(const ImageData &p_data);
 }

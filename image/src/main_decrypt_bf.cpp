@@ -1,8 +1,7 @@
 #include <iostream>
 #include <string>
 #include <common.hpp>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stbi_image_write.h>
+
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
@@ -28,6 +27,5 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "Found key : " << l_goodKey << "; Entropy : " << l_minEntropy << std::endl;
-
-    stbi_write_png(argv[2], l_result.width, l_result.height, l_result.channels, l_result.data, 0);
+    Common::ImageData::SaveImage(l_result, argv[2]);
 }

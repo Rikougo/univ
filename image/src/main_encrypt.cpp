@@ -1,8 +1,6 @@
 #include <iostream>
 #include <string>
 #include <common.hpp>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stbi_image_write.h>
 
 int main(int argc, char* argv[]) {
     if (argc < 4) {
@@ -12,5 +10,5 @@ int main(int argc, char* argv[]) {
 
     Common::ImageData l_encrpyted = Common::EncryptData(argv[1], std::stoi(argv[3]));
 
-    stbi_write_png(argv[2], l_encrpyted.width, l_encrpyted.height, l_encrpyted.channels, l_encrpyted.data, 0);
+    Common::ImageData::SaveImage(l_encrpyted, argv[2]);
 }
