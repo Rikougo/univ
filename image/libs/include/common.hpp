@@ -11,7 +11,7 @@ namespace Common
         unsigned char *data;
         int width, height, channels;
 
-        int TotalSize() { return width * height * channels; }
+        int TotalSize() const { return width * height * channels; }
         static ImageData FromPath(const char *p_path);
         static void SaveImage(ImageData &p_data, const char *p_path);
         static void SaveImage(ImageData &p_data, std::string p_path);
@@ -27,6 +27,9 @@ namespace Common
 
     float ComputEntropy(const char *p_path);
     float ComputeEntropy(ImageData &p_data);
+
+    float ComputeBER(ImageData const &p_left, ImageData const &p_right);
+    float ComputeBER(const char *p_left, const char *p_right);
 
     std::vector<std::array<int, 256>> ComputeHistogram(const char *p_path);
     std::vector<std::array<int, 256>> ComputeHistogram(ImageData &p_data);

@@ -11,6 +11,12 @@ target("psnr")
     add_files("src/main_psnr.cpp")
     add_includedirs("include", "libs/include")
 
+target("ber")
+    set_kind("binary")
+    add_deps("lib")
+    add_files("src/main_ber.cpp")
+    add_includedirs("include", "libs/include")
+
 target("histogram")
     set_kind("binary")
     add_deps("lib")

@@ -112,6 +112,31 @@ namespace Common
         return l_sum;
     }
 
+    float ComputeBER(ImageData const &p_left, ImageData const &p_right)
+    {
+        if (p_left.TotalSize() != p_right.TotalSize())
+            return 1.0f;
+
+        int l_ber = 0;
+        for (int i = 0; i < p_left.TotalSize(); i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                unsigned char l_leftValue = (p_left.data[i] & (1 << j));
+                unsigned char l_rightValue = (p_right.data[i] & (1 << j));
+
+                if (l_leftValue != l_rightValue)
+                    l_ber++;
+            }
+        }
+
+        return (float)l_ber / (float)p_left.TotalSize();
+    }
+    float ComputeBER(const char *p_left, const char *p_right)
+    {
+        return ComputeBER(ImageData::FromPath(p_left), ImageData::FromPath(p_right));
+    }
+
     ImageData PermutData(const char *p_path, int p_key)
     {
         int l_channels, l_width, l_height;
