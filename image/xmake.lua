@@ -46,9 +46,9 @@ target("decrypt_bf")
     add_deps("lib")
     add_files("src/main_decrypt_bf.cpp")
     add_includedirs("include", "libs/include")
-
-target("AES")
+    
+target("substitute")
     set_kind("binary")
     add_deps("lib")
-    add_files("src/main_aes.cpp")
+    add_files("src/main_substitute.cpp")
     add_includedirs("include", "libs/include")
