@@ -558,4 +558,120 @@ namespace Common
 
         return {l_result, l_readImage};
     }
+
+    // NEURAL NETWORK
+    NeuralNetwork::NeuralNetwork(size_t p_layerAmount, size_t p_layerSize)
+    {
+        m_layers = std::vector<Node>(p_layerAmount * p_layerSize, {0.0f,
+                                                                   std::vector<float>(p_layerSize, 0.0f)});
+
+        m_size = NNSize{p_layerAmount, p_layerSize};
+
+        std::cout << "Init neural network... Layer size : " << m_layers.size() << std::endl;
+    }
+
+    void NeuralNetwork::setRandomWeights(size_t p_seed = 0)
+    {
+        std::default_random_engine l_generator;
+        std::uniform_real_distribution<float> l_distribution(-1.0f, 1.0f);
+
+        if (p_seed != 0)
+            l_generator.seed(p_seed);
+
+        for (auto &l_node : m_layers)
+        {
+            size_t l_weightSize = l_node.weights.size();
+            for (int i = 0; i < l_weightSize; i++)
+            {
+                l_node.weights[i] = l_distribution(l_generator);
+            }
+        }
+    }
+
+    void NeuralNetwork::setActivation(std::function<float(float)> p_activation)
+    {
+        m_activation = p_activation;
+    }
+
+    std::vector<float> NeuralNetwork::work(std::vector<float> p_firstLayer)
+    {
+        size_t l_firstLayerSize = p_firstLayer.size();
+
+        std::cout << "Start working..." << std::endl;
+
+        for (int i = 0; i < l_firstLayerSize; i++)
+        {
+            m_layers[i].value = p_firstLayer[i];
+        }
+
+        std::cout << "Intialization done. Start propagation..." << std::endl;
+
+        return propagate(NeuralNetwork::FIRST_LAYER);
+    }
+
+    std::vector<float> NeuralNetwork::propagate(size_t p_layerIndex)
+    {
+        // reach last layer, return value
+        if (p_layerIndex >= m_size.layerAmount - 1)
+        {
+            std::cout << "Last layer hit, initializing return last layer..." << std::endl;
+
+            size_t l_lastOffset = (m_size.layerAmount - 1) * m_size.layerSize;
+            std::vector<float> l_lastLayer(m_size.layerSize, 0.0f);
+            for (int i = l_lastOffset; i < m_layers.size(); i++)
+            {
+                l_lastLayer[i - l_lastOffset] = m_layers[i].value;
+            }
+
+            std::cout << "Return last layer ready." << std::endl;
+
+            return l_lastLayer;
+        }
+
+        size_t l_offset = p_layerIndex * m_size.layerSize;
+        size_t l_nextOffset = (p_layerIndex + 1) * m_size.layerSize;
+
+        std::cout << "Preparing propagation... " << l_offset << ", " << l_nextOffset << std::endl;
+
+        for (int i = 0; i < m_size.layerSize; i++)
+        {
+            m_layers[l_nextOffset + i].value = 0.0f;
+
+            std::cout << "Set value to 0" << std::endl;
+
+            for (int j = 0; j < m_size.layerSize; j++)
+            {
+                m_layers[l_nextOffset + i].value += m_layers[l_nextOffset + i].weights[j] * m_layers[l_offset + j].value;
+            }
+
+            m_layers[l_nextOffset + i].value = m_activation(m_layers[l_nextOffset + i].value);
+        }
+
+        std::cout << "Propagation done. Go to next." << std::endl;
+
+        return propagate(p_layerIndex + 1);
+    }
+
+    std::vector<Node> NeuralNetwork::at(size_t p_layerIndex)
+    {
+        if (p_layerIndex >= m_size.layerAmount)
+        {
+            throw std::exception("Layer index out of bound");
+        }
+
+        std::vector<Node> l_result(m_size.layerSize);
+
+        size_t l_offset = p_layerIndex * m_size.layerSize;
+        for (int i = 0; i < m_size.layerSize; i++)
+        {
+            l_result[i] = m_layers[l_offset + i];
+        }
+
+        return l_result;
+    }
+
+    NNSize NeuralNetwork::size() const noexcept
+    {
+        return m_size;
+    }
 }

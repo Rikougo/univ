@@ -3,6 +3,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <functional>
 
 namespace Common
 {
@@ -51,4 +52,46 @@ namespace Common
     ImageData RandomNoise(const ImageData &p_data);
 
     ImagePair HideData(ImageData const &p_source, unsigned char *const p_data, int p_dataLen, int p_key, int p_substitute);
+
+    struct Node
+    {
+        float value;
+        std::vector<float> weights;
+    };
+
+    struct NNSize
+    {
+        size_t layerAmount;
+        size_t layerSize;
+    };
+
+    class NeuralNetwork
+    {
+    public:
+        static const size_t FIRST_LAYER = 0;
+        static const std::array<float, 9> CONVOLUTION_FILTER{
+            0.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 0.0f};
+
+    public:
+        NeuralNetwork(size_t p_layerAmount, size_t p_layerSize);
+        ~NeuralNetwork() = default;
+
+        void setRandomWeights(size_t p_seed);
+        void setActivation(std::function<float(float)> p_activation);
+        std::vector<float> work(std::vector<float> p_firstLayer);
+
+        NNSize size() const noexcept;
+        std::vector<Node> at(size_t p_layerIndex);
+
+    private:
+        std::vector<float> propagate(size_t p_layerIndex);
+
+    private:
+        std::vector<Node> m_layers;
+        std::function<float(float)> m_activation;
+
+        NNSize m_size;
+    };
 }
