@@ -7,6 +7,12 @@
 
 namespace Common
 {
+    enum PoolingType {
+        MAX,
+        AVERAGE,
+        SUM
+    };
+
     struct ImageData
     {
         unsigned char *data;
@@ -16,6 +22,51 @@ namespace Common
         static ImageData FromPath(const char *p_path);
         static void SaveImage(ImageData &p_data, const char *p_path);
         static void SaveImage(ImageData &p_data, std::string p_path);
+    };
+
+    struct ConvolutionalFilter {
+        unsigned int width, height;
+        float* data;
+
+        unsigned char ApplyFilter(ImageData const &p_source, unsigned int p_x, unsigned int p_y, unsigned int p_c) const;
+    };
+    
+    struct Node
+    {
+        float value;
+        std::vector<float> weights;
+    };
+
+    struct NNSize
+    {
+        size_t layerAmount;
+        size_t layerSize;
+    };
+
+    class NeuralNetwork
+    {
+    public:
+        static const size_t FIRST_LAYER = 0;
+
+    public:
+        NeuralNetwork(size_t p_layerAmount, size_t p_layerSize);
+        ~NeuralNetwork() = default;
+
+        void setRandomWeights(size_t p_seed);
+        void setActivation(std::function<float(float)> p_activation);
+        std::vector<float> work(std::vector<float> p_firstLayer);
+
+        NNSize size() const noexcept;
+        std::vector<Node> at(size_t p_layerIndex);
+
+    private:
+        std::vector<float> propagate(size_t p_layerIndex);
+
+    private:
+        std::vector<Node> m_layers;
+        std::function<float(float)> m_activation;
+
+        NNSize m_size;
     };
 
     using ImagePair = std::pair<ImageData, ImageData>;
@@ -53,45 +104,6 @@ namespace Common
 
     ImagePair HideData(ImageData const &p_source, unsigned char *const p_data, int p_dataLen, int p_key, int p_substitute);
 
-    struct Node
-    {
-        float value;
-        std::vector<float> weights;
-    };
-
-    struct NNSize
-    {
-        size_t layerAmount;
-        size_t layerSize;
-    };
-
-    class NeuralNetwork
-    {
-    public:
-        static const size_t FIRST_LAYER = 0;
-        static const std::array<float, 9> CONVOLUTION_FILTER{
-            0.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 0.0f};
-
-    public:
-        NeuralNetwork(size_t p_layerAmount, size_t p_layerSize);
-        ~NeuralNetwork() = default;
-
-        void setRandomWeights(size_t p_seed);
-        void setActivation(std::function<float(float)> p_activation);
-        std::vector<float> work(std::vector<float> p_firstLayer);
-
-        NNSize size() const noexcept;
-        std::vector<Node> at(size_t p_layerIndex);
-
-    private:
-        std::vector<float> propagate(size_t p_layerIndex);
-
-    private:
-        std::vector<Node> m_layers;
-        std::function<float(float)> m_activation;
-
-        NNSize m_size;
-    };
+    ImageData ApplyCNFilter(ImageData const &p_source, ConvolutionalFilter const &p_filter);
+    ImageData Pooling(ImageData const &p_source, PoolingType p_type);
 }
