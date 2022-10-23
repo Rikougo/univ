@@ -559,6 +559,8 @@ namespace Common
         return {l_result, l_readImage};
     }
 
+    
+
     // NEURAL NETWORK
     NeuralNetwork::NeuralNetwork(size_t p_layerAmount, size_t p_layerSize)
     {
@@ -673,5 +675,69 @@ namespace Common
     NNSize NeuralNetwork::size() const noexcept
     {
         return m_size;
+    }
+
+    unsigned char ConvolutionalFilter::ApplyFilter(ImageData const &p_source, unsigned int p_x, unsigned int p_y, unsigned int p_c) const {
+        unsigned int l_result = 0;
+
+        for(int i = 0; i < height; i++) {
+            unsigned int l_yOffset = (p_y + i) * p_source.width;
+
+            for(int j = 0; j < width; j++) {
+                l_result += (unsigned int)(data[i * width + j] * (float)p_source.data[(l_yOffset + (p_x + j)) * p_source.channels + p_c]);
+            }
+        }
+        
+        return (unsigned char) l_result;
+    }
+
+    ImageData Common::ApplyCNFilter(ImageData const &p_source, ConvolutionalFilter const &p_filter) {
+        unsigned int l_newWidth = p_source.width - p_filter.width;
+        unsigned int l_newHeight = p_source.height - p_filter.height;
+
+        ImageData l_result{};
+        l_result.width = l_newWidth; l_result.height = l_newHeight;
+        l_result.channels = p_source.channels;
+        l_result.data = new unsigned char[l_newWidth * l_newHeight * l_result.channels];
+
+        std::cout << "Channels : " << l_result.channels << std::endl;
+
+        for(int i = 0; i < l_newHeight; i++) {
+            for(int j = 0; j < l_newWidth; j++) {
+                for(int c = 0; c < l_result.channels; c++) {
+                    l_result.data[(i * l_newWidth + j) * l_result.channels + c] = p_filter.ApplyFilter(p_source, j, i, c);
+                }
+            }
+        }
+
+        return l_result;
+    }
+
+    ImageData Common::Pooling(ImageData const &p_source, PoolingType p_type) {
+        ImageData l_result{};
+        l_result.width = p_source.width / 2; l_result.height = p_source.height / 2;
+        l_result.channels = p_source.channels;
+        l_result.data = new unsigned char[l_result.width * l_result.height];
+
+        // std::cout << "Width, height : " << p_source.width << "x" << p_source.height << ", " << l_result.width << "x" << l_result.height << std::endl;
+
+        for(int i = 0; i < p_source.height - (p_source.height % 2); i += 2) {
+            for(int j = 0; j < p_source.width - (p_source.width % 2); j += 2) {
+                unsigned int l_poolOffset = (i / 2 * l_result.width + j /2);
+                switch (p_type) {
+                    case MAX:
+                        l_result.data[l_poolOffset] = std::max(
+                            std::max(p_source.data[(i * l_result.width + j)], p_source.data[((i+1) * l_result.width + j)]), 
+                            std::max(p_source.data[(i * l_result.width + (j+1))], p_source.data[((i+1) * l_result.width + (j+1))]));
+                        break;
+                    case AVERAGE:
+                    break;
+                    case SUM:
+                    break;
+                }
+            }
+        }
+
+        return l_result;
     }
 }
