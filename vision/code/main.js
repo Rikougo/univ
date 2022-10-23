@@ -44,16 +44,6 @@ const OnDrawLine = () => {
         parseFloat(document.getElementById('cInput').value)
     ];
 
-    console.log(`Draw line of equation ${a}x + ${b}y + ${c}`);
-
-    const u = -c / a;
-    const uValue = a * u + c;
-
-    const v = -c / b;
-    const vValue = b * v + c;
-    const p1 = new cv.Point(u, uValue);
-    const p2 = new cv.Point(vValue, v);
-
     let imgElement = document.getElementById('imageSrc');
     let source = cv.imread(imgElement);
     cv.line(source, p1, p2, [0, 255, 0, 255], 1);
@@ -67,4 +57,7 @@ const OnMouseCallback = (event) => {
         Math.floor((event.clientY - rect.top) / zoom)
     ];
     document.getElementById("clicked").innerHTML = `Clicked ${x}, ${y}`;
+    let imgElement = document.getElementById('imageSrc');
+    let source = cv.imread(imgElement);
+    console.log(source.ucharPtr(y, x));
 }
