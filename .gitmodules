@@ -5,5 +5,8 @@
 	path = sma/repo
 	url = git@github.com:Rikougo/Brobot.git
 [submodule "image3d/Tattoo3D"]
-	path = image3d/Tattoo3D
+	path = image/Tattoo3D
 	url = https://github.com/sbeugnon/hmin322-idc-3D.git
+[submodule "projet_image"]
+	path = projet_image
+	url = git@github.com:Rikougo/ImageCartoonizer.git
