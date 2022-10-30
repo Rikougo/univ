@@ -10,3 +10,6 @@
 [submodule "projet_image"]
 	path = projet_image
 	url = git@github.com:Rikougo/ImageCartoonizer.git
+[submodule "projet_3d/tmp_Vulkan"]
+	path = projet_3d/tmp_Vulkan
+	url = git@github.com:Rikougo/tmp_Vulkan.git
